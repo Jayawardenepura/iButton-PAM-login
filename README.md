@@ -54,6 +54,3 @@ How to solve it see [here](https://playground.arduino.cc/Linux/Udev).
 
 Documentations is really ungly,i`m so sorry. We work on this.
 
-## Youtube video
-
-[click for watching](https://youtu.be/mNG5HiPbjjc)
