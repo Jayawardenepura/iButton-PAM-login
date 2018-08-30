@@ -35,8 +35,8 @@ char hash_str[65];
 */
 static inline void error_exit(enum serial_err err)
 {
-    fprintf(stderr, "%s\n", serial_errmsg[err]);
-    exit(err);
+	fprintf(stderr, "%s\n", serial_errmsg[err]);
+	exit(err);
 }
 
 
@@ -75,18 +75,16 @@ if(sp_open(serial_port,SP_MODE_READ) != SP_OK)
 
 	sp_free_port_list(detected_ports);
         sp_set_baudrate(serial_port,baudrate);
-
         int bytes_waiting;
 	unsigned int timeout = 0;
 	while(1){
 		bytes_waiting = sp_input_waiting(serial_port);
-		if (bytes_waiting > 0) {
+		if (bytes_waiting > 0){
 			   int byte_num = 0;
-
 			/* use only nonblocking type for runtime */
 			   byte_num = sp_nonblocking_read(serial_port,data,size);
 			   if(!byte_num) 
-			      sleep(0.5);
+			   	sleep(0.5);
 		}
 		for(int db_field = 0;db_field < cnt_keys;db_field++){
 			/* search concurrences  with UART data and hashes */
@@ -95,15 +93,16 @@ if(sp_open(serial_port,SP_MODE_READ) != SP_OK)
 		  	  return E_OK;
 			}			
 		}
-		sleep(1);timeout++;
+		sleep(1);
+		timeout++;
 		if(timeout > ttl){
-		  sp_close(serial_port);
-		  return E_UNPLUGGED;
+			sp_close(serial_port);
+			return E_UNPLUGGED;
 		}
 		/* Device has been unplugged or any serial data */
-		 if(bytes_waiting < 0){
-		  sp_close(serial_port);
-		  error_exit(E_UNPLUGGED); 
+		if(bytes_waiting < 0){
+			sp_close(serial_port);
+			error_exit(E_UNPLUGGED); 
 		}
 	}
 }
@@ -114,13 +113,11 @@ if(sp_open(serial_port,SP_MODE_READ) != SP_OK)
 */
 static inline char *list_ports(void) 
 {
-	int a_ports;
 	if (sp_list_ports(&detected_ports) != SP_OK) 
 	  error_exit(E_DETECTION);
-
-	/* Search an available serial */
-	for (a_ports = 0; detected_ports[a_ports]; ++a_ports);
-
-	/* dir to tty com device*/
-	return sp_get_port_name(detected_ports[a_ports]);
+	int aPort;
+	/* Search an available serial port*/
+	for (aPort = 0; detected_ports[aPort]; aPort++);
+	/*return string dir to tty com device*/
+	return sp_get_port_name(detected_ports[--aPort]);
 }

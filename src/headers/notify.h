@@ -12,30 +12,26 @@
   */
 static inline bool search_com_device(const char *desired_port,int ttl)
 {
-	int wd,inotifyFd;
-	int attempt = 0;
-
-	inotifyFd = inotify_init1(IN_NONBLOCK);               
-	if(inotifyFd == -1)
+	int wd,inotify_fd,timeout = 0;
+	inotify_fd = inotify_init1(IN_NONBLOCK);               
+	if(inotify_fd == -1)
 		return false;
 	do{
-		wd = inotify_add_watch(inotifyFd, desired_port, IN_MODIFY | IN_MOVE);
+		wd = inotify_add_watch(inotify_fd, desired_port, IN_MODIFY | IN_MOVE);
 		sleep(1);
-		attempt++;
-
-	/* time for device connection*/
-	if(attempt > ttl)
-		return false;
-
+		timeout++;
+		/* time for device connection*/
+		if(timeout > ttl)
+			return false;
 	}while(wd == -1);
- return true;
+ 	return true;
 }
 
 
 /*! 
  *@brief The functions to_byte_array & to_byte_array were taken from:    
  *https://stackoverflow.com/a/50085715
-*/
+ */
 static inline uint8_t hex(char ch) {
     uint8_t r = (ch > '9') ? (ch - '7') : (ch - '0');
     return r & 0x0F;
@@ -48,7 +44,7 @@ static inline uint8_t hex(char ch) {
  *@params[in] in_size - count of symbols
  *@params[in] out - output hex 8 byte array  
  *@return count - number of bytes
-*/
+ */
 static inline int to_byte_array(const char *in, size_t in_size, uint8_t *out) {
     int count = 0;
     if (in_size % 2) {

@@ -95,7 +95,6 @@ PAM_EXTERN int pam_sm_authenticate( pam_handle_t *pamh, int flags,int argc, cons
 	struct ibutton_keys_ hash_key_[num_of_mem];
 	uint8_t id_msg[7],hash[32];
 	char interm_hash[64];
-
 	/* move through the database fields */
 	for(size_t i = 0;i < num_of_mem;++i){ 
 		config_setting_t *nodes = config_setting_get_elem(db_ibutton, i);
@@ -103,28 +102,22 @@ PAM_EXTERN int pam_sm_authenticate( pam_handle_t *pamh, int flags,int argc, cons
 
 		/* scan filling of the fields */
 		config_setting_lookup_string(db_ibutton, section_name, &(key_[i].ibutton_crc_id));
-
 		/* convert hex string to byte in array for hmac */ 
 		to_byte_array(key_[i].ibutton_crc_id,14,id_msg); /*14 = sizeof(key_[i].id)-1*/
-
 		hmac_sha256(hash,hmac_key_byte,160,id_msg,56);
-
 		for(int byte = 0;byte < 32; ++byte)
 			sprintf(&interm_hash[byte*2], "%02x", hash[byte]);
-
 		strcpy(hash_key_[i].hash_str,interm_hash);
 	}
 
 	enum serial_err error_out;
 
-	static char *desired_port;
-
-	if(NULL == (desired_port = list_ports()))
+	char *desired_port = list_ports();
+	if(desired_port == NULL)
 		return PAM_SERVICE_ERR;
 
 	char byte_buff[65];
 	error_out = open_read_com(desired_port, attempts, _baudrate, byte_buff, hash_key_, num_of_mem, 65);
-
 	if(E_UNPLUGGED == error_out)
 		return PAM_USER_UNKNOWN;
 
