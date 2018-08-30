@@ -1,5 +1,5 @@
-#include <libserialport.h> // cross platform serial port lib
-#include <libconfig.h>   
+#include <libserialport.h> /* cross platform serial port lib. see https://sigrok.org/wiki/Libserialport */
+#include <libconfig.h>   /* https://github.com/hyperrealm/libconfig */
 #include <security/pam_appl.h>
 #include <security/pam_modules.h>
 #include <stdio.h>
