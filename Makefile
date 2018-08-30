@@ -15,7 +15,7 @@ CONFIG=ibutton_pam
 CONFIG:=$(addsuffix .config, $(CONFIG)) 
 
 CC=gcc
-CFLAGS=-fpic -fno-stack-protector -c
+CFLAGS=-O2 -fpic -fno-stack-protector -c
 SOFLAGS=-shared -Xlinker -x 
 
 PAM_PATH=/lib/security/

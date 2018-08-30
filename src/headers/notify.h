@@ -3,7 +3,7 @@
 #include <stdbool.h>
 
 /*! @fn static inline bool search_com_device(const char *desired_port,int ttl)
-  * @brief This is a part of project witch is resposible for detecting a new serial devices.
+  * @brief This is a part of project witch is resposible for detecting a new serial devices via inotify dir detection
   *
   *  The inotify helps us to check state of any path of the system 
   * @param desired_port the path to the tty device
@@ -32,8 +32,12 @@ static inline bool search_com_device(const char *desired_port,int ttl)
 }
 
 
+/*! 
+ *@brief The functions to_byte_array & to_byte_array were taken from:    
+ *https://stackoverflow.com/a/50085715
+*/
 static inline uint8_t hex(char ch) {
-    uint8_t r = (ch > 57) ? (ch - 55) : (ch - 48);
+    uint8_t r = (ch > '9') ? (ch - '7') : (ch - '0');
     return r & 0x0F;
 }
 

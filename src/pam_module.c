@@ -62,8 +62,6 @@ PAM_EXTERN int pam_sm_authenticate( pam_handle_t *pamh, int flags,int argc, cons
 		return PAM_SERVICE_ERR;
 	}
 
-	/*************************************************************************/
-
 	bool searched_dev;
 	/* you should create rules for tty avr devices, see 09-uno.rules*/
 	searched_dev = search_com_device(direct_to_dev,attempts); /* PORT */
@@ -95,8 +93,8 @@ PAM_EXTERN int pam_sm_authenticate( pam_handle_t *pamh, int flags,int argc, cons
 	struct ibutton_keys_ key_[num_of_mem];
 	/* hash result */
 	struct ibutton_keys_ hash_key_[num_of_mem];
-	uint8_t id_msg[7],hash[20];
-	char interm_hash[65];
+	uint8_t id_msg[7],hash[32];
+	char interm_hash[64];
 
 	/* move through the database fields */
 	for(size_t i = 0;i < num_of_mem;++i){ 
@@ -104,10 +102,10 @@ PAM_EXTERN int pam_sm_authenticate( pam_handle_t *pamh, int flags,int argc, cons
 		const char *section_name = config_setting_name(nodes); 
 
 		/* scan filling of the fields */
-		config_setting_lookup_string(db_ibutton, section_name, &(key_[i].id));
+		config_setting_lookup_string(db_ibutton, section_name, &(key_[i].ibutton_crc_id));
 
 		/* convert hex string to byte in array for hmac */ 
-		to_byte_array(key_[i].id,14,id_msg); /*14 = sizeof(key_[i].id)-1*/
+		to_byte_array(key_[i].ibutton_crc_id,14,id_msg); /*14 = sizeof(key_[i].id)-1*/
 
 		hmac_sha256(hash,hmac_key_byte,160,id_msg,56);
 
@@ -115,18 +113,14 @@ PAM_EXTERN int pam_sm_authenticate( pam_handle_t *pamh, int flags,int argc, cons
 			sprintf(&interm_hash[byte*2], "%02x", hash[byte]);
 
 		strcpy(hash_key_[i].hash_str,interm_hash);
-		strcat(hash_key_[i].hash_str,"\n");
 	}
-	/*************************************************************************/
 
 	enum serial_err error_out;
 
 	static char *desired_port;
 
-	if(NULL == list_ports())
+	if(NULL == (desired_port = list_ports()))
 		return PAM_SERVICE_ERR;
-
-	desired_port = list_ports();
 
 	char byte_buff[65];
 	error_out = open_read_com(desired_port, attempts, _baudrate, byte_buff, hash_key_, num_of_mem, 65);

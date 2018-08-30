@@ -4,17 +4,11 @@
 #include <unistd.h>
 #include <string.h>
 
-/*! \brief indentify port */
-static struct sp_port *port;
-/*! \brief available ports */
-static struct sp_port **ports;
-
-
 ///Error enum 
 enum serial_err {
+	E_OPEN = EX_NOINPUT, ///< File /dev/tty* did not exit
 	E_OK = 0,	     ///< No errors
 	E_COM,		     ///< Serial port has`t opened
-	E_OPEN = EX_NOINPUT, ///< File /dev/tty* did not exit
 	E_DETECTION,	     ///< No serial devices
 	E_UNPLUGGED,	     ///< Device has been unpugged or no connection
 };
@@ -31,7 +25,7 @@ char *serial_errmsg[] = {
  @brief database,which contains encrypted keys 
 */
 struct ibutton_keys_{
-const char *id;
+const char *ibutton_crc_id;
 char hash_str[65];
 };
 
@@ -44,6 +38,14 @@ static inline void error_exit(enum serial_err err)
     fprintf(stderr, "%s\n", serial_errmsg[err]);
     exit(err);
 }
+
+
+/*! \brief indentify port */
+static struct sp_port *serial_port;
+/*! \brief available port */
+static struct sp_port **detected_ports;
+
+
 /*! 
 	@fn static inline enum serial_err open_read_com(const char *the_port,
 					    unsigned int attempt,
@@ -61,70 +63,64 @@ static inline void error_exit(enum serial_err err)
 */
 static inline enum serial_err open_read_com(const char *the_port,
 					    unsigned int ttl,
- 					    unsigned int baudrate,
+ 					    long baudrate,
   					    char *data,struct ibutton_keys_ hash[],
 					    unsigned int cnt_keys,unsigned int size)
 {
-if(sp_get_port_by_name(the_port,&port) != SP_OK)
+if(sp_get_port_by_name(the_port,&serial_port) != SP_OK)
 	error_exit(E_OPEN);
 
-if(sp_open(port,SP_MODE_READ) != SP_OK) 
+if(sp_open(serial_port,SP_MODE_READ) != SP_OK) 
 	error_exit(E_COM);
 
-	sp_free_port_list(ports);
-        sp_set_baudrate(port,baudrate);
+	sp_free_port_list(detected_ports);
+        sp_set_baudrate(serial_port,baudrate);
 
-        int bytes_waiting = 0,
-	    cnt_attempts;		
-	unsigned int tries = 0;
+        int bytes_waiting;
+	unsigned int timeout = 0;
 	while(1){
-		bytes_waiting = sp_input_waiting(port);
+		bytes_waiting = sp_input_waiting(serial_port);
 		if (bytes_waiting > 0) {
 			   int byte_num = 0;
 
 			/* use only nonblocking type for runtime */
-			   byte_num = sp_nonblocking_read(port,data,size);
+			   byte_num = sp_nonblocking_read(serial_port,data,size);
 			   if(!byte_num) 
 			      sleep(0.5);
 		}
-		for(cnt_attempts = 0;cnt_attempts < cnt_keys;cnt_attempts++){
+		for(int db_field = 0;db_field < cnt_keys;db_field++){
 			/* search concurrences  with UART data and hashes */
-			if(strncmp(hash[cnt_attempts].hash_str,data,64) == 0){
-			  sp_close(port);
+			if(strncmp(hash[db_field].hash_str,data,64) == 0){
+			  sp_close(serial_port);
 		  	  return E_OK;
 			}			
 		}
-		 sleep(1);
-	         tries++;
-		if(tries > ttl){
-		  sp_close(port);
+		sleep(1);timeout++;
+		if(timeout > ttl){
+		  sp_close(serial_port);
 		  return E_UNPLUGGED;
 		}
 		/* Device has been unplugged or any serial data */
 		 if(bytes_waiting < 0){
-		  sp_close(port);
+		  sp_close(serial_port);
 		  error_exit(E_UNPLUGGED); 
 		}
 	}
-
-	  sp_free_port_list(ports);
- 	  sp_close(port);
 }
 
 /*!
 	@brief search avaliable COM ports 
 	@return name of available COM Port
-
 */
 static inline char *list_ports(void) 
 {
-	int i;
-	if (sp_list_ports(&ports) != SP_OK) 
+	int a_ports;
+	if (sp_list_ports(&detected_ports) != SP_OK) 
 	  error_exit(E_DETECTION);
 
 	/* Search an available serial */
-	for (i = 0; ports[i]; i++);
+	for (a_ports = 0; detected_ports[a_ports]; ++a_ports);
 
 	/* dir to tty com device*/
-	return sp_get_port_name(ports[i-1]);
+	return sp_get_port_name(detected_ports[a_ports]);
 }
