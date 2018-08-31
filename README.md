@@ -18,7 +18,7 @@ For detecting a new serial connections is used "inotify".Inotify is a Linux kern
 Availability to use password login after a timeout.(default 30 seconds for avr connection and 30 seconds for key)
 
 Pay attention!
-You are able to configure your pam module for you intentions before installation.See **ibutton_pam.config**.
+You are able to configure your pam module for you intentions before installation.See ```**ibutton_pam.config**```.
 
 Which device does we need?
 
@@ -30,13 +30,13 @@ About. In brief, this device is transmitting hash from ibutton keys, which are s
 
 Build project:
 
-- $make all 
+- ```$make all```
 
 Set config and module:
-- $make install
+- ```$make install```
 
 Clean:
-- $make clean
+- ```$make clean```
 
 If you wanna use this module for greeter (ARCHE Linux distribution) you should configure /etc/pam.d/lightdm:
 https://wiki.archlinux.org/index.php/LightDM , field **Enabling interactive passwordless login**
