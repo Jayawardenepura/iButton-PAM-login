@@ -7,27 +7,24 @@ It will be usefull for persons who don`t prefer type a long passwords in a passw
 Our system provides authorization in your personal Linux system via iButton keys or any 1-Wire device. 
 
 The main idea it is login your personal Linux system via iButton keys. 
-The iButton keys are contained in **/etc/ibutton_pam.config, field: ibutton_id_database** 
-on the Linux side.Via this config, user is able to add any number of persons and keys. 
+The iButton keys are contained in a special database-config in a linux direction, which user is able to config.
 
-All keys are encrypted via hmac-sha256 and the hmac_key which user can configure in **/etc/ibutton_pam.config, field: hmac_key**.
+All keys are encrypted via hmac-sha256.It is a specific type of message authentication code (MAC) involving a cryptographic hash function and a secret cryptographic key.
 
-Already encrypted struct of keys(struct ibutton_keys_) are compared with the transmitted by UART interface keys.
+The hash from the database`s keys is compared with serial input data by 64 symbols each.
 
-For tracking a new connections is used "inotify".
+For detecting a new serial connections is used "inotify".Inotify is a Linux kernel subsystem that acts to extend filesystems to notice changes to the filesystem, and report those changes to applications.
 
-Moreover user can deploy the time to login via iButton key in seconds.(/etc/ibutton_pam.config, field: time_to_live).
-
-For example if user hasn`t time to login via key or connection to device, he will have a chance to login via Linux password.
+Availability to use password login after a timeout.(default 30 seconds for avr connection and 30 seconds for key)
 
 Pay attention!
-You are able to employ your pam module for you intetions before install.See **ibutton_pam.config**.
+You are able to configure your pam module for you intentions before installation.See **ibutton_pam.config**.
 
 Which device does we need?
 
-See [this appliance](https://github.com/Jayawardenepura/GL-C-Embeedded/tree/master/ibutton-lock).
+See [this appliance](https://github.com/Jayawardenepura/iButton_lock).
 
-In brief, this device will transmit hash from ibutton keys,which are stored in MCU EEPROM.
+About. In brief, this device is transmitting hash from ibutton keys, which are stored in an MCU EEPROM.
 
 ## Usage
 
@@ -41,16 +38,23 @@ Set config and module:
 Clean:
 - $make clean
 
-If you wanna use this module for greeter (ARCHE) you should configure your /etc/pam.d/lightdm:
-https://wiki.archlinux.org/index.php/LightDM
+If you wanna use this module for greeter (ARCHE Linux distribution) you should configure /etc/pam.d/lightdm:
+https://wiki.archlinux.org/index.php/LightDM , field **Enabling interactive passwordless login**
 
-For security you should limit permissions for the main ibutton_pam.config
+Your /etc/pam.d/lightdm should looks like this:
+```#%PAM-1.0
+**auth        sufficient  **identify.so** user ingroup nopasswdlogin**
+auth        include     system-login
+......
+```
 
-**$chmod 660 /etc/ibutton_pam.config**
+For security you should limit permissions for the /etc/ibutton_pam.config
+
+```$chmod 660 /etc/ibutton_pam.config```
 
 The one unsolved feature it is non-static link COM port:
 
-How to solve it see [here](https://playground.arduino.cc/Linux/Udev).
+How to solve it for your arduino device see [here](https://playground.arduino.cc/Linux/Udev).
 
-Documentations is really ungly,i`m so sorry. We work on this.
+Documentations refman is really ungly,i`m so sorry. We work on this.
 
