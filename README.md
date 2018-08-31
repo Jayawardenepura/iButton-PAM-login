@@ -42,7 +42,8 @@ If you wanna use this module for greeter (ARCHE Linux distribution) you should c
 https://wiki.archlinux.org/index.php/LightDM , field **Enabling interactive passwordless login**
 
 Your /etc/pam.d/lightdm should looks like this:
-```#%PAM-1.0
+```
+%PAM-1.0
 auth        sufficient  identify.so user ingroup nopasswdlogin
 auth        include     system-login
 ......
@@ -52,7 +53,7 @@ For security you should limit permissions for the /etc/ibutton_pam.config
 
 ```$chmod 660 /etc/ibutton_pam.config```
 
-The one unsolved feature it is non-static link COM port:
+The one unsolved feature it is non-static link COM port.
 
 How to solve it for your arduino device see [here](https://playground.arduino.cc/Linux/Udev).
 
