@@ -86,13 +86,12 @@ if(sp_open(serial_port,SP_MODE_READ) != SP_OK)
 			   if(!byte_num) 
 			   	sleep(0.5);
 		}
-		for(int db_field = 0;db_field < cnt_keys;db_field++){
+		for(int db_field = 0;db_field < cnt_keys;db_field++)
 			/* search concurrences  with UART data and hashes */
 			if(strncmp(hash[db_field].hash_str,data,64) == 0){
 			  sp_close(serial_port);
 		  	  return E_OK;
 			}			
-		}
 		sleep(1);
 		timeout++;
 		if(timeout > ttl){
@@ -114,8 +113,8 @@ if(sp_open(serial_port,SP_MODE_READ) != SP_OK)
 static inline char *list_ports(void) 
 {
 	if (sp_list_ports(&detected_ports) != SP_OK) 
-	  error_exit(E_DETECTION);
-	int aPort;
+		error_exit(E_DETECTION);
+	unsigned int aPort;
 	/* Search an available serial port*/
 	for (aPort = 0; detected_ports[aPort]; aPort++);
 	/*return string dir to tty com device*/
