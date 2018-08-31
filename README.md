@@ -18,7 +18,7 @@ For detecting a new serial connections is used "inotify".Inotify is a Linux kern
 Availability to use password login after a timeout.(default 30 seconds for avr connection and 30 seconds for key)
 
 Pay attention!
-You are able to configure your pam module for you intentions before installation.See ```**ibutton_pam.config**```.
+You are able to configure your pam module for you intentions before installation.See [```ibutton_pam.config```](https://github.com/Jayawardenepura/iButton-PAM-module/blob/master/ibutton_pam.config).
 
 Which device does we need?
 
@@ -43,7 +43,7 @@ https://wiki.archlinux.org/index.php/LightDM , field **Enabling interactive pass
 
 Your /etc/pam.d/lightdm should looks like this:
 ```#%PAM-1.0
-**auth        sufficient  **identify.so** user ingroup nopasswdlogin**
+auth        sufficient  identify.so user ingroup nopasswdlogin
 auth        include     system-login
 ......
 ```
