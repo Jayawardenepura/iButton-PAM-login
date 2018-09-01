@@ -30,13 +30,13 @@ About. In brief, this device is transmitting hash from ibutton keys, which are s
 
 Build project:
 
-- ```$make all```
+- ```$ make all```
 
 Set config and module:
-- ```$make install```
+- ```$ make install```
 
 Clean:
-- ```$make clean```
+- ```$ make clean```
 
 If you wanna use this module for greeter (ARCHE Linux distribution) you should configure /etc/pam.d/lightdm:
 https://wiki.archlinux.org/index.php/LightDM , field **Enabling interactive passwordless login**
