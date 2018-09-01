@@ -38,7 +38,7 @@ Set config and module:
 Clean:
 - ```$ make clean```
 
-If you wanna use this module for greeter (ARCHE Linux distribution) you should configure /etc/pam.d/lightdm:
+If you wanna use this module for greeter (Arch linux) you should configure /etc/pam.d/lightdm:
 https://wiki.archlinux.org/index.php/LightDM , field **Enabling interactive passwordless login**
 
 Your /etc/pam.d/lightdm should looks like this:
